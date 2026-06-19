@@ -1,0 +1,178 @@
+---
+# Phase 1 - Java Import / Type 전환 규칙
+# 기준: eGov_3.1_lib.pdf 원본 73개 라이브러리 분석
+# 환경: eGovFrame 4.3 / Spring 5.3.37 / JDK 8
+
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.JavaImport
+displayName: "eGov Phase1 - Java Import / Type 전환"
+description: "전자정부프레임워크 3.x → 4.3 Java import 패키지 및 타입명 자동 전환"
+tags:
+  - egov
+  - phase1
+  - java
+
+recipeList:
+
+  # ════════════════════════════════════════════
+  # 1. eGov RTE 패키지 전환
+  #    egovframework.rte → org.egovframe.rte
+  #    주의: context-common.xml 의 classpath 경로는 XML이므로 Phase2(Python)에서 처리
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.fdl.cmmn
+      newPackageName: org.egovframe.rte.fdl.cmmn
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.fdl.idgnr
+      newPackageName: org.egovframe.rte.fdl.idgnr
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.fdl.logging
+      newPackageName: org.egovframe.rte.fdl.logging
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.fdl.property
+      newPackageName: org.egovframe.rte.fdl.property
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.fdl.security
+      newPackageName: org.egovframe.rte.fdl.security
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.psl.dataaccess
+      newPackageName: org.egovframe.rte.psl.dataaccess
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.ptl.mvc
+      newPackageName: org.egovframe.rte.ptl.mvc
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.itl
+      newPackageName: org.egovframe.rte.itl
+      recursive: true
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: egovframework.rte.bat
+      newPackageName: org.egovframe.rte.bat
+      recursive: true
+
+  # 주의: egovframework.com(공통컴포넌트) 패키지 매핑은 분석 문서에 명시된 근거 없음
+  #       4.3 공통컴포넌트의 실제 패키지명 확인 후 적용 여부 결정 필요
+  #       확인 전까지 이 항목은 주석 처리하고 수동 검토 권장
+  # - org.openrewrite.java.ChangePackage:
+  #     oldPackageName: egovframework.com
+  #     newPackageName: org.egovframe.com
+  #     recursive: true
+
+  # ════════════════════════════════════════════
+  # 2. Jackson 1.x → 2.x 패키지 전환
+  #    ChangePackage로 패키지 단위 전환 먼저 처리 (누락 타입 방지)
+  #    이후 ChangeType으로 패키지 구조가 달라진 타입을 개별 보정
+  # ════════════════════════════════════════════
+
+  # 2-1. annotate 패키지: 구조 동일하므로 ChangePackage 가능
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson.annotate
+      newPackageName: com.fasterxml.jackson.annotation
+      recursive: true
+
+  # 2-2. map → databind 패키지: ChangePackage 후 일부 ChangeType으로 보정
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson.map
+      newPackageName: com.fasterxml.jackson.databind
+      recursive: true
+
+  # 2-3. core 루트 패키지 (JsonFactory, JsonParser, JsonGenerator 등)
+  #      recursive: false 필수 — true 사용 시 2-1/2-2에서 처리한 하위 패키지를
+  #      com.fasterxml.jackson.core.annotate, com.fasterxml.jackson.core.map 등
+  #      잘못된 경로로 이중 변환할 위험이 있음
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.codehaus.jackson
+      newPackageName: com.fasterxml.jackson.core
+      recursive: false
+
+  # 2-4. map.annotate → databind.annotation 개별 보정
+  #      ChangePackage(map→databind) 후에도 annotate 하위는 경로가 다름
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.fasterxml.jackson.databind.annotate.JsonSerialize
+      newFullyQualifiedTypeName: com.fasterxml.jackson.databind.annotation.JsonSerialize
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: com.fasterxml.jackson.databind.annotate.JsonDeserialize
+      newFullyQualifiedTypeName: com.fasterxml.jackson.databind.annotation.JsonDeserialize
+
+  # 2-5. ObjectMapper: ChangePackage 후 정상 위치이므로 추가 보정 불필요
+  #      com.fasterxml.jackson.databind.ObjectMapper 로 자동 처리됨
+
+  # ════════════════════════════════════════════
+  # 제외 항목 (Phase3 대상)
+  # ════════════════════════════════════════════
+  # Jackson DeserializationConfig, SerializationConfig:
+  #   - 1.x와 2.x 간 클래스 구조 자체가 다름 (단순 rename 아님)
+  #   - ChangeType으로 import만 바꾸면 컴파일 오류 발생
+  #   → Phase3(LLM)에서 사용 패턴별 개별 보정 필요
+  # ════════════════════════════════════════════
+
+  # ════════════════════════════════════════════
+  # 3. Spring MVC: Spring 5에서 제거된 클래스 → 대체 클래스
+  #
+  #    ※ ChangeType은 Java 소스 파일만 처리
+  #       XML 설정 파일의 아래 형태는 Phase2(Python)에서 별도 처리 필요
+  #       <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
+  # ════════════════════════════════════════════
+
+  # Java 코드에서 타입으로 참조하는 경우만 처리됨
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.http.converter.json.MappingJacksonHttpMessageConverter
+      newFullyQualifiedTypeName: org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping
+      newFullyQualifiedTypeName: org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter
+      newFullyQualifiedTypeName: org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
+
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerExceptionResolver
+      newFullyQualifiedTypeName: org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver
+
+  # ════════════════════════════════════════════
+  # 4. jdom → jdom2 패키지 전환
+  #    org.jdom → org.jdom2
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: org.jdom
+      newPackageName: org.jdom2
+      recursive: true
+
+  # ════════════════════════════════════════════
+  # 5. Logging: Commons Logging → SLF4J
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.java.logging.slf4j.CommonsLoggingToSlf4j
+
+  # ════════════════════════════════════════════
+  # 제외 항목 (Phase2 대상)
+  # ════════════════════════════════════════════
+  # Oracle driverClassName:
+  #   - Java 코드에서 Class.forName("oracle.jdbc.driver.OracleDriver") 형태로 사용
+  #   - ChangeType은 타입 선언/참조를 처리하며 문자열 리터럴은 처리 불가
+  #   - XML의 driverClassName 속성값도 마찬가지
+  #   → Phase2(Python)에서 문자열 치환으로 처리
+  #
+  # Spring LDAP:
+  #   - Java 패키지명은 동일하게 유지됨
+  #   - Maven artifactId 변경(spring-ldap → spring-ldap-core)만 필요
+  #   → egov-maven-dependency.yaml 에서 처리

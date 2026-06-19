@@ -1,0 +1,85 @@
+---
+# Phase 1 - Spring 주변 라이브러리 전환 규칙
+# Spring Framework 버전 업그레이드는 egov-maven-dependency.yaml 에서 처리
+# 이 파일은 Spring Security, Tiles, JSTL 처리
+#
+# 주의: Servlet API는 egov-maven-dependency.yaml 에서 처리하므로 여기서 중복 정의하지 않음
+
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.SpringUpgrade
+displayName: "eGov Phase1 - Spring 주변 라이브러리 전환"
+description: "Spring Security, Tiles, JSTL 등 Spring 주변 라이브러리 전환"
+tags:
+  - egov
+  - phase1
+  - spring
+
+recipeList:
+
+  # ════════════════════════════════════════════
+  # 1. Spring Security 버전 업그레이드
+  #    Spring 5.3.37과 호환되는 5.8.x 계열 사용
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework.security
+      artifactId: spring-security-core
+      newVersion: "5.8.14"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework.security
+      artifactId: spring-security-web
+      newVersion: "5.8.14"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework.security
+      artifactId: spring-security-config
+      newVersion: "5.8.14"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework.security
+      artifactId: spring-security-taglibs
+      newVersion: "5.8.14"
+
+  # ════════════════════════════════════════════
+  # 2. Tiles 버전 업그레이드
+  #    Spring 5와 호환되는 3.0.8 사용
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.tiles
+      artifactId: tiles-core
+      newVersion: "3.0.8"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.tiles
+      artifactId: tiles-jsp
+      newVersion: "3.0.8"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.tiles
+      artifactId: tiles-extras
+      newVersion: "3.0.8"
+
+  # ════════════════════════════════════════════
+  # 3. JSTL
+  #    eGovFrame 4.3 = Servlet 3.1 기반 → javax.* 유지 원칙
+  #    jstl-1.2(API) + standard-1.1.2(구현체) 조합은 정상
+  #    WAS 내장 JSTL 구현체와 중복 여부는 수동 확인 필요
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: taglibs
+      oldArtifactId: standard
+      newGroupId: org.apache.taglibs
+      newArtifactId: taglibs-standard-impl
+      newVersion: "1.2.5"
+
+  # ════════════════════════════════════════════
+  # 제외 항목 (수동 처리 필요)
+  # ════════════════════════════════════════════
+  # JTA (javax.transaction:jta):
+  #   - 상용 WAS(JEUS, WebLogic)는 자체 JTA 제공 → WEB-INF/lib에서 제거 검토
+  #   - Tomcat + 단일 DB 환경은 Spring DataSourceTransactionManager로 대체 가능
+  #   - 버전 자체 변경이 없으므로 OpenRewrite 처리 대상 아님
+  #   → 수동 확인 후 pom.xml에서 직접 제거

@@ -1,0 +1,62 @@
+---
+# Phase 1 - OpenRewrite 실행 진입점 (통합 recipe)
+# 기준: eGov_3.1_lib.pdf 원본 73개 라이브러리 분석
+#
+# 사용법:
+#   mvn rewrite:dryRun   (변환 내용 미리보기 — 소스 변경 없음)
+#   mvn rewrite:run      (실제 변환 적용)
+#
+# pom.xml 플러그인 설정은 pom-plugin-template.xml 참조
+
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.All
+displayName: "eGov Phase1 - 전체 전환 (통합)"
+description: "전자정부프레임워크 3.x → 4.3 Phase1 전체 자동 전환 (73개 라이브러리 기준)"
+tags:
+  - egov
+  - phase1
+
+recipeList:
+
+  # 1. Maven Dependency 전환 (groupId/artifactId/version)
+  - egov.migration.phase1.MavenDependency
+
+  # 2. Java Import / Type 전환
+  - egov.migration.phase1.JavaImport
+
+  # 3. Spring 주변 라이브러리 전환
+  - egov.migration.phase1.SpringUpgrade
+
+# ────────────────────────────────────────────
+# Phase 1 처리 범위 (총 73개 중 자동화 가능 항목)
+# ────────────────────────────────────────────
+# ✅ 포함 (OpenRewrite 자동):
+#   - eGov RTE 4.3.0 전환 (19~24번)
+#   - Spring 5.3.37 전환 (56~68번)
+#   - MyBatis 3.5.16 + mybatis-spring 2.1.2 (48~49번)
+#   - DBCP2 + Pool2 (10, 17번)
+#   - ojdbc14 → ojdbc8 (50번)
+#   - Jackson 1.x → 2.x (30~31번)
+#   - Log4j2 2.23.1 보안 패치 (43~46번)
+#   - SLF4J 1.7.36 버전 통일 (35, 55번)
+#   - iText → OpenPDF (28번)
+#   - PDFBox 2.x (52번)
+#   - BouncyCastle groupId/artifact 변경 (6번)
+#   - jasypt 1.9.3 (32~33번)
+#   - jsch → mwiede fork (38번)
+#   - jdom → jdom2 (37번)
+#   - Quartz 2.3.2 의존성 (54번)
+#   - Commons 계열 버전 업 (8~9, 12~18번)
+#   - aopalliance 제거 (4번)
+#   - spring-modules-validation 제거 (64번)
+#   - Spring MVC 삭제 클래스 타입 변환 (68번)
+#   - Commons Logging → SLF4J import 변환
+#
+# ⚠️ Phase 1 제외 (Phase2/3에서 처리):
+#   - DBCP 속성명 변경 (XML: maxActive→maxTotal 등)
+#   - Oracle driverClassName 변경 (XML)
+#   - context-common.xml classpath 경로 변경 (XML)
+#   - Quartz 스케줄러 XML 설정 재작성
+#   - iBatis → MyBatis SQL XML 전환
+#   - SimpleFormController 등 소스 재작성
+#   - 사설/국산 라이브러리 (공급사 확인 필요)

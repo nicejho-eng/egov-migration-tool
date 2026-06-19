@@ -1,0 +1,481 @@
+---
+# Phase 1 - Maven Dependency 전환 규칙
+# 기준: eGov_3.1_lib.pdf 원본 73개 라이브러리 분석
+# 환경: eGovFrame 4.3 / Spring 5.3.37 / JDK 8 / Servlet 3.1
+
+type: specs.openrewrite.org/v1beta/recipe
+name: egov.migration.phase1.MavenDependency
+displayName: "eGov Phase1 - Maven Dependency 전환"
+description: "전자정부프레임워크 3.x → 4.3 Maven Dependency 자동 전환 (73개 라이브러리 기준)"
+tags:
+  - egov
+  - phase1
+  - maven
+
+recipeList:
+
+  # ════════════════════════════════════════════
+  # 1. eGov RTE 4.3.0 전환
+  #    egovframework.rte → org.egovframe.rte
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.cmmn
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.cmmn
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.idgnr
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.idgnr
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.logging
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.logging
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.property
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.property
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.psl.dataaccess
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.psl.dataaccess
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.ptl.mvc
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.ptl.mvc
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.fdl.security
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.fdl.security
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.itl.namedquery
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.itl.namedquery
+      newVersion: "4.3.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: egovframework.rte
+      oldArtifactId: egovframework.rte.bat.core
+      newGroupId: org.egovframe.rte
+      newArtifactId: org.egovframe.rte.bat.core
+      newVersion: "4.3.0"
+
+  # ════════════════════════════════════════════
+  # 2. Spring Framework 5.3.37
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-aop
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-beans
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-context
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-context-support
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-core
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-expression
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-jdbc
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-orm
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-tx
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-web
+      newVersion: "5.3.37"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.springframework
+      artifactId: spring-webmvc
+      newVersion: "5.3.37"
+
+  # spring-modules-validation: Spring 5 에서 제거됨 → 제거
+  - org.openrewrite.maven.RemoveDependency:
+      groupId: org.springmodules
+      artifactId: spring-modules-validation
+
+  # aopalliance: Spring 5 에 내장됨 → 별도 jar 제거
+  - org.openrewrite.maven.RemoveDependency:
+      groupId: aopalliance
+      artifactId: aopalliance
+
+  # spring-ldap: artifactId 변경
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.springframework.ldap
+      oldArtifactId: spring-ldap
+      newGroupId: org.springframework.ldap
+      newArtifactId: spring-ldap-core
+      newVersion: "2.4.1"
+
+  # ════════════════════════════════════════════
+  # 3. AspectJ
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.aspectj
+      artifactId: aspectjweaver
+      newVersion: "1.9.21"
+
+  # ════════════════════════════════════════════
+  # 4. MyBatis + mybatis-spring
+  #    반드시 세트로 업그레이드 (mybatis-spring 2.x = mybatis 3.5.x 이상 필수)
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.mybatis
+      artifactId: mybatis
+      newVersion: "3.5.16"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.mybatis
+      artifactId: mybatis-spring
+      newVersion: "2.1.2"
+
+  # ════════════════════════════════════════════
+  # 5. DBCP1 → DBCP2 / Pool1 → Pool2
+  #    groupId, artifactId 모두 변경
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: commons-dbcp
+      oldArtifactId: commons-dbcp
+      newGroupId: org.apache.commons
+      newArtifactId: commons-dbcp2
+      newVersion: "2.9.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: commons-pool
+      oldArtifactId: commons-pool
+      newGroupId: org.apache.commons
+      newArtifactId: commons-pool2
+      newVersion: "2.12.0"
+
+  # ════════════════════════════════════════════
+  # 6. Oracle JDBC: ojdbc14 → ojdbc8
+  # ════════════════════════════════════════════
+
+  # ojdbc8 버전은 연결 Oracle DB 버전에 맞게 조정 필요
+  # 예: Oracle 11g → 21.x 드라이버도 하위 호환 지원
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: com.oracle
+      oldArtifactId: ojdbc14
+      newGroupId: com.oracle.database.jdbc
+      newArtifactId: ojdbc8
+      newVersion: "21.11.0.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: oracle
+      oldArtifactId: ojdbc14
+      newGroupId: com.oracle.database.jdbc
+      newArtifactId: ojdbc8
+      newVersion: "21.11.0.0"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: com.oracle
+      oldArtifactId: ojdbc6
+      newGroupId: com.oracle.database.jdbc
+      newArtifactId: ojdbc8
+      newVersion: "21.11.0.0"
+
+  # ════════════════════════════════════════════
+  # 7. Jackson 1.x → 2.x
+  #    org.codehaus.jackson → com.fasterxml.jackson
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.codehaus.jackson
+      oldArtifactId: jackson-core-asl
+      newGroupId: com.fasterxml.jackson.core
+      newArtifactId: jackson-core
+      newVersion: "2.15.4"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.codehaus.jackson
+      oldArtifactId: jackson-mapper-asl
+      newGroupId: com.fasterxml.jackson.core
+      newArtifactId: jackson-databind
+      newVersion: "2.15.4"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.codehaus.jackson
+      oldArtifactId: jackson-jaxrs
+      newGroupId: com.fasterxml.jackson.jaxrs
+      newArtifactId: jackson-jaxrs-json-provider
+      newVersion: "2.15.4"
+
+  # ════════════════════════════════════════════
+  # 8. Logging: Log4j2 보안 패치 / SLF4J 버전 통일
+  #    CVE-2021-44228(Log4Shell) 취약 버전 2.3.x → 2.23.1
+  #    Java 8 기준 안전 최소: 2.17.1, 권장: 2.23.1
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-api
+      newVersion: "2.23.1"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-core
+      newVersion: "2.23.1"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.logging.log4j
+      artifactId: log4j-slf4j-impl
+      newVersion: "2.23.1"
+
+  # log4j-over-slf4j: Log4j 1.x API → SLF4J 브릿지 (groupId는 org.slf4j)
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: log4j-over-slf4j
+      newVersion: "1.7.36"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: slf4j-api
+      newVersion: "1.7.36"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.slf4j
+      artifactId: jcl-over-slf4j
+      newVersion: "1.7.36"
+
+  # commons-logging 제거는 jcl-over-slf4j 선언 여부를 확인 후 수동으로 처리
+  # 자동 제거 시 jcl-over-slf4j가 없는 프로젝트에서 빌드 오류 발생 위험
+  # 확인 명령: mvn dependency:tree | grep commons-logging
+  # - org.openrewrite.maven.RemoveDependency:
+  #     groupId: commons-logging
+  #     artifactId: commons-logging
+
+  # ════════════════════════════════════════════
+  # 9. iText 2.x → OpenPDF
+  #    com.lowagie.text 패키지 동일하게 유지되므로 소스 import 변경 불필요
+  #    Maven 의존성 교체만으로 전환 가능
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: com.lowagie
+      oldArtifactId: itext
+      newGroupId: com.github.librepdf
+      newArtifactId: openpdf
+      newVersion: "1.3.30"
+
+  # ════════════════════════════════════════════
+  # 10. PDFBox 1.x → 2.x
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.pdfbox
+      artifactId: pdfbox
+      newVersion: "2.0.31"
+
+  # ════════════════════════════════════════════
+  # 11. BouncyCastle
+  #     groupId: bouncycastle → org.bouncycastle
+  #     artifactId: bcprov-ext-jdk15 → bcprov-jdk18on
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: bouncycastle
+      oldArtifactId: bcprov-ext-jdk15
+      newGroupId: org.bouncycastle
+      newArtifactId: bcprov-jdk18on
+      newVersion: "1.78.1"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: bouncycastle
+      oldArtifactId: bcprov-jdk15
+      newGroupId: org.bouncycastle
+      newArtifactId: bcprov-jdk18on
+      newVersion: "1.78.1"
+
+  # ════════════════════════════════════════════
+  # 12. jasypt
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.jasypt
+      artifactId: jasypt
+      newVersion: "1.9.3"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: org.jasypt
+      oldArtifactId: jasypt-spring3
+      newGroupId: org.jasypt
+      newArtifactId: jasypt-spring31
+      newVersion: "1.9.3"
+
+  # ════════════════════════════════════════════
+  # 13. jsch: 원본 jcraft 방치 → mwiede fork
+  #     groupId: com.jcraft → com.github.mwiede
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: com.jcraft
+      oldArtifactId: jsch
+      newGroupId: com.github.mwiede
+      newArtifactId: jsch
+      newVersion: "0.2.17"
+
+  # ════════════════════════════════════════════
+  # 14. jdom → jdom2
+  #     groupId: jdom → org.jdom2
+  #     artifactId: jdom → jdom2
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: jdom
+      oldArtifactId: jdom
+      newGroupId: org.jdom2
+      newArtifactId: jdom2
+      newVersion: "2.0.6"
+
+  # ════════════════════════════════════════════
+  # 15. Quartz 1.x → 2.x
+  #     주의: API 전면 변경 - XML 스케줄러 설정 재작성 필요 (Phase2에서 처리)
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.quartz-scheduler
+      artifactId: quartz
+      newVersion: "2.3.2"
+
+  # ════════════════════════════════════════════
+  # 16. Commons 계열 버전 업그레이드
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-fileupload
+      artifactId: commons-fileupload
+      newVersion: "1.5"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-beanutils
+      artifactId: commons-beanutils
+      newVersion: "1.9.4"
+
+  # commons-collections: 소스 변경 없는 단기 패치 버전 (3.2.2)
+  # 장기 전환(4.4)은 패키지명 변경으로 소스 수정 필요 → Phase2에서 처리
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-collections
+      artifactId: commons-collections
+      newVersion: "3.2.2"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-io
+      artifactId: commons-io
+      newVersion: "2.15.1"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: org.apache.commons
+      artifactId: commons-lang3
+      newVersion: "3.14.0"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-validator
+      artifactId: commons-validator
+      newVersion: "1.7.0"
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: commons-net
+      artifactId: commons-net
+      newVersion: "3.11.1"
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: commons-digester
+      oldArtifactId: commons-digester
+      newGroupId: org.apache.commons
+      newArtifactId: commons-digester3
+      newVersion: "3.2"
+
+  # ════════════════════════════════════════════
+  # 17. ICU4J
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: com.ibm.icu
+      artifactId: icu4j
+      newVersion: "75.1"
+
+  # ════════════════════════════════════════════
+  # 18. Servlet API
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: javax.servlet
+      oldArtifactId: servlet-api
+      newGroupId: javax.servlet
+      newArtifactId: javax.servlet-api
+      newVersion: "4.0.1"
+
+  # ════════════════════════════════════════════
+  # 19. javax.mail
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: javax.mail
+      oldArtifactId: mail
+      newGroupId: com.sun.mail
+      newArtifactId: javax.mail
+      newVersion: "1.6.2"
+
+  # ════════════════════════════════════════════
+  # 20. jackcess (MS Access 파일 처리)
+  # ════════════════════════════════════════════
+
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: com.healthmarketscience.jackcess
+      artifactId: jackcess
+      newVersion: "4.0.5"

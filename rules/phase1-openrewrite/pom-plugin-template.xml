@@ -1,0 +1,102 @@
+<!--
+  전자정부프레임워크 3.x → 4.3 Phase1 전환용 OpenRewrite 플러그인 설정
+  대상 프로젝트의 pom.xml > build > plugins 에 추가한다.
+
+  실행 명령:
+    mvn rewrite:dryRun   (변환 내용 미리보기 — 소스 변경 없음)
+    mvn rewrite:run      (실제 변환 적용)
+
+  이 파일이 위치한 경로를 configLocation에 지정하거나
+  대상 프로젝트 루트에 rewrite.yaml 을 복사해서 사용한다.
+-->
+<plugin>
+  <groupId>org.openrewrite.maven</groupId>
+  <artifactId>rewrite-maven-plugin</artifactId>
+  <version>5.40.0</version>
+  <configuration>
+    <activeRecipes>
+      <recipe>egov.migration.phase1.All</recipe>
+    </activeRecipes>
+    <!--
+      configLocation은 단일 파일만 지정 가능하므로
+      모든 recipe를 rewrite.yaml 한 파일에 통합하거나
+      아래와 같이 각 파일을 별도 configLocation으로 지정한다.
+
+      사용 방법 A (권장): 모든 recipe 파일을 대상 프로젝트 루트에 복사 후
+        mvn rewrite:run \
+          -Drewrite.configLocation=rewrite.yaml \
+          -Drewrite.configLocation=egov-maven-dependency.yaml \
+          -Drewrite.configLocation=egov-java-import.yaml \
+          -Drewrite.configLocation=egov-spring-upgrade.yaml
+
+      사용 방법 B: 아래와 같이 각 파일 경로를 쉼표로 구분하여 지정
+    -->
+    <configLocation>${project.basedir}/rewrite.yaml</configLocation>
+    <configLocations>
+      <configLocation>${project.basedir}/rewrite.yaml</configLocation>
+      <configLocation>${project.basedir}/egov-maven-dependency.yaml</configLocation>
+      <configLocation>${project.basedir}/egov-java-import.yaml</configLocation>
+      <configLocation>${project.basedir}/egov-spring-upgrade.yaml</configLocation>
+    </configLocations>
+  </configuration>
+  <dependencies>
+    <!-- Maven/Java 기본 레시피 -->
+    <dependency>
+      <groupId>org.openrewrite.recipe</groupId>
+      <artifactId>rewrite-java-dependencies</artifactId>
+      <version>1.19.0</version>
+    </dependency>
+    <!-- Logging 레시피 (CommonsLoggingToSlf4j 포함) -->
+    <dependency>
+      <groupId>org.openrewrite.recipe</groupId>
+      <artifactId>rewrite-logging-frameworks</artifactId>
+      <version>2.14.0</version>
+    </dependency>
+    <!-- Spring 레시피 -->
+    <dependency>
+      <groupId>org.openrewrite.recipe</groupId>
+      <artifactId>rewrite-spring</artifactId>
+      <version>5.20.0</version>
+    </dependency>
+  </dependencies>
+</plugin>
+
+<!--
+  ════════════════════════════════════════════
+  Phase 1 이후 수동 확인 필수 항목
+  ════════════════════════════════════════════
+
+  1. DBCP2 속성명 변경 (XML 설정 파일 수동 수정)
+     - maxActive      → maxTotal
+     - maxWait        → maxWaitMillis
+     - removeAbandoned → removeAbandonedOnBorrow
+
+  2. Oracle driverClassName 변경 (XML 설정 파일 수동 수정)
+     - oracle.jdbc.driver.OracleDriver → oracle.jdbc.OracleDriver
+     검색: rg "oracle\.jdbc\.driver\.OracleDriver" .
+
+  3. context-common.xml classpath 경로 변경 (idgnr, property)
+     - classpath:/egovframework/rte/fdl/idgnr/...
+       → classpath:/org/egovframe/rte/fdl/idgnr/...
+     - classpath:/egovframework/rte/fdl/property/...
+       → classpath:/org/egovframe/rte/fdl/property/...
+
+  4. Quartz 스케줄러 XML 설정 전면 재작성 (1.x API → 2.x API 완전 변경)
+     검색: rg "org\.quartz|JobDetail|CronTrigger|SchedulerFactoryBean" .
+
+  5. log4j2.xml 정리 (bridge 조합 금지 조합 확인)
+     금지: log4j-to-slf4j + log4j-slf4j-impl 동시 사용
+
+  6. 사설/국산 라이브러리 공급사 확인 필요 항목:
+     - xecure-7.jar
+     - jcaos-client-arccert-1.4.7.1.jar
+     - ozenc_utf8.jar
+     - lib.dstspdfSig-1.1.jar
+     - lib.magic.tsaclient-1.1.jar
+     - export.file-2.0.jar
+     - Petra-1.0.0.jar
+     - xdataset-1.0.1.jar
+
+  7. 보안 취약점 스캔 (마이그레이션 전 우선 수행)
+     mvn org.owasp:dependency-check-maven:check -DnvdApiKey=YOUR_KEY
+-->
