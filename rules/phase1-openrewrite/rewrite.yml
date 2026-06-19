@@ -1,4 +1,4 @@
-  # openRewrite yml 초안
+  # openRewrite yml 샘플
 type: specs.openrewrite.org/v1beta/recipe
 name: egov.poc.Egov31To43Phase1
 displayName: eGovFrame 3.1 to 4.3 Phase1
