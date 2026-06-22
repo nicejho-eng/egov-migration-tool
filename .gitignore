@@ -21,3 +21,6 @@ output/reports/*
 # Build
 target/
 build/
+
+# phase 1-2
+rules\phase1-2-openrewrite
